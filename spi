@@ -29,7 +29,17 @@ firew1 ()	{
 # Function for iptables rules (CentOS 7, Debian, Ubuntu, Fedora)
 firew2 ()	{
 	# Opening default Squid port 3128 for clients to connect
-	iptables -I INPUT -p tcp --dport 3128 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 8088 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 54321 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 7860 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 4680 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 78640 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 82360 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 90560 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 6780 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 3567 -j ACCEPT
+	
 	# Saving firewall rules
 	iptables-save
 }
@@ -108,12 +118,26 @@ deb ()	{
 	apt-get update
 	# Installing necessary packages (Squid, apache2-utils for htpassword and dependencies)
 	apt-get install apache2-utils squid3 -y
+	
+	
 	# Asking user to set a username via read and writing it into $usrn
-	read -e -p "Your desired username: " usrn
+	#read -e -p "Your desired username: " usrn
 	# Creating user with username from $usrn and asking user to set a password
-	htpasswd -c /etc/squid3/passwd $usrn
+	#htpasswd -c /etc/squid3/passwd $usrn
+	
+	#install php 
+	apt-get install php5-common libapache2-mod-php5 php5-cli -y
+	
+	# edit error page
+	rm /usr/share/squid3/errors/templates/ERR_INVALID_URL
+	touch /usr/share/squid3/errors/templates/ERR_INVALID_URL
+	echo "invalid url" | tee -a /usr/share/squid3/errors/templates/ERR_INVALID_URL
+	
+	# Download php auth
+	wget -O /etc/squid3/auth.php https://raw.githubusercontent.com/mrpaul92/spi/master/auth.php --no-check-certificate
+	
 	# Downloading Squid configuration
-	wget -O /etc/squid3/squid.conf https://raw.githubusercontent.com/hidden-refuge/squid-proxy-installer/master/spi-debian.conf --no-check-certificate
+	wget -O /etc/squid3/squid.conf https://raw.githubusercontent.com/mrpaul92/spi/master/spi-debian.conf --no-check-certificate
 	# Creating empty blacklist.acl file for further blacklisting entries
 	touch /etc/squid3/blacklist.acl
 	# Restarting Squid and enabling its service
