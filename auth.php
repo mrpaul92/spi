@@ -1,4 +1,3 @@
-
 <?php
 $f = fopen("php://stdin", "r");
 while ($line = fgets($f)) {
